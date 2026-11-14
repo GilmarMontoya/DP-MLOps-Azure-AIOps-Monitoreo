@@ -8,3 +8,11 @@ antenv/
 *.egg-info/
 .ipynb_checkpoints/
 .git.disabled/
+
+# Generado por generar_dashboard.py: contiene el ID de suscripcion
+Azure-Grafana-AIOps/dashboard-aiops.json
+# Symlinks a skills globales (~/.claude/skills): rutas locales, se rompen en GitHub
+.claude/skills/azure-grafana-aiops
+.claude/skills/azure-grafana-aiops-cleanup
+.claude/skills/azureml-model-monitoring
+.claude/skills/azureml-model-monitoring-cleanup

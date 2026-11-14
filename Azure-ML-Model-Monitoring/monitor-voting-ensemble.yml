@@ -1,0 +1,60 @@
+# Model Monitoring del endpoint Voting Ensemble (regresion: predice charges).
+# Compara los datos que llegan al endpoint (model_inputs) contra los datos
+# de entrenamiento de AutoML (plan-de-salud v1).
+# Sin start_time: la primera ejecucion arranca al crear el monitor.
+$schema: http://azureml/sdk-2-0/Schedule.json
+name: monitor-voting-ensemble-mlops
+display_name: Monitor Voting Ensemble (plan de salud)
+description: Data drift y data quality del endpoint-voting-ensemble-mlops contra los datos de entrenamiento
+tags:
+  lab: model-monitoring
+
+trigger:
+  type: recurrence
+  frequency: day
+  interval: 1
+
+create_monitor:
+  compute:
+    instance_type: standard_e4s_v3   # la mas chica que permite Spark serverless; cobra solo mientras corre
+    runtime_version: "3.4"
+
+  monitoring_target:
+    ml_task: regression
+    endpoint_deployment_id: azureml:endpoint-voting-ensemble-mlops:modelo-voting-ensemble-mlops18
+
+  monitoring_signals:
+    data_drift_vs_entrenamiento:
+      type: data_drift
+      reference_data:
+        input_data:
+          path: azureml:plan-de-salud:1
+          type: mltable
+        data_context: training
+      features: [age, sex, bmi, children, smoker, region]
+      alert_enabled: true
+      metric_thresholds:
+        numerical:
+          jensen_shannon_distance: 0.1
+        categorical:
+          jensen_shannon_distance: 0.1
+
+    calidad_de_datos:
+      type: data_quality
+      reference_data:
+        input_data:
+          path: azureml:plan-de-salud:1
+          type: mltable
+        data_context: training
+      features: [age, sex, bmi, children, smoker, region]
+      alert_enabled: true
+      metric_thresholds:
+        numerical:
+          null_value_rate: 0.05
+          out_of_bounds_rate: 0.03
+        categorical:
+          null_value_rate: 0.05
+          out_of_bounds_rate: 0.03
+  alert_notification:
+    emails:
+      - <TU_CORREO>   # la CLI lo exige; reemplazalo antes de az ml schedule create

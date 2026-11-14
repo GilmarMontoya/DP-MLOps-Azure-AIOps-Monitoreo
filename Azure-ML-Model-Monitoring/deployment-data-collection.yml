@@ -1,0 +1,15 @@
+# Activa la recoleccion de datos de produccion (model_inputs / model_outputs)
+# en el deployment existente. Es un modelo MLflow (no-code): Azure ML
+# instrumenta el scoring solo, no hace falta score.py ni environment.
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+name: modelo-voting-ensemble-mlops18
+endpoint_name: endpoint-voting-ensemble-mlops
+model: azureml:modelo-voting-ensemble-mlops18:1
+instance_type: Standard_DS1_v2   # la VM mas barata que aceptan los managed online endpoints
+instance_count: 1
+data_collector:
+  collections:
+    model_inputs:
+      enabled: 'True'
+    model_outputs:
+      enabled: 'True'
